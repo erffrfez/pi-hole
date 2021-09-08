@@ -154,7 +154,7 @@ while ($row = $adlistResults->fetchArray()) {
 if (empty($adlistsUrls))
     die("[ERROR]: There are no adlists enabled");
 
-// Get total number of blocklists (Including Whitelist, Blacklist & Wildcard lists)
+// Get total number of blocklists (Including Allowlist, Blocklist & Wildcard lists)
 $adlistsCount = count($adlistsUrls) + 3;
 
 // Set query timeout
@@ -210,11 +210,11 @@ foreach ($queryAds as $str) {
     @$queryResults[$value[0]] .= "$value[1]";
 }
 
-// Determine if domain has been blacklisted, whitelisted, wildcarded or CNAME blocked
-if (strpos($queryAds[0], "blacklist") !== FALSE) {
-    $notableFlagClass = "blacklist";
+// Determine if domain has been blocklisted, Allowed, wildcarded or CNAME blocked
+if (strpos($queryAds[0], "blocklist") !== FALSE) {
+    $notableFlagClass = "blocklist";
     $adlistsUrls = array("π" => substr($queryAds[0], 2));
-} elseif (strpos($queryAds[0], "whitelist") !== FALSE) {
+} elseif (strpos($queryAds[0], "Allowed") !== FALSE) {
     $notableFlagClass = "noblock";
     $adlistsUrls = array("π" => substr($queryAds[0], 2));
     $wlInfo = "recentwl";
@@ -275,8 +275,8 @@ setHeader();
       if ($featuredTotal > 0) {
         echo '$("#bpBack").removeAttr("href");';
 
-        // Enable whitelisting if JS is available
-        echo '$("#bpWhitelist").prop("disabled", false);';
+        // Enable Allowing if JS is available
+        echo '$("#bpAllowlist").prop("disabled", false);';
 
         // Enable password input if necessary
         if (!empty($svPasswd)) {
@@ -338,10 +338,10 @@ setHeader();
     <span id="bpFoundIn"><span><?=$featuredTotal ?></span><?=$adlistsCount ?></span>
     <pre id='bpQueryOutput'><?php if ($featuredTotal > 0) foreach ($queryResults as $num => $value) { echo "<span>[$num]:</span>$adlistsUrls[$num]\n"; } ?></pre>
 
-    <form id="bpWLButtons" class="buttons">
-      <input id="bpWLDomain" type="text" value="<?=$serverName ?>" disabled>
-      <input id="bpWLPassword" type="password" placeholder="JavaScript disabled" disabled>
-      <button id="bpWhitelist" type="button" disabled></button>
+    <form id="bpALButtons" class="buttons">
+      <input id="bpALDomain" type="text" value="<?=$serverName ?>" disabled>
+      <input id="bpALPassword" type="password" placeholder="JavaScript disabled" disabled>
+      <button id="bpAllowlist" type="button" disabled></button>
     </form>
   </div>
 </main>
@@ -361,7 +361,7 @@ setHeader();
     $.ajax({
       url: "/admin/scripts/pi-hole/php/add.php",
       method: "post",
-      data: {"domain":domain, "list":"white", "pw":pw.val()},
+      data: {"domain":domain, "list":"allow", "pw":pw.val()},
       success: function(response) {
         if(response.indexOf("Pi-hole blocking") !== -1) {
           setTimeout(function(){window.location.reload(1);}, 10000);
@@ -387,7 +387,7 @@ setHeader();
             add();
         }
     });
-    $("#bpWhitelist").on("click", function() {
+    $("#bpAllowlist").on("click", function() {
         add();
     });
   <?php } ?>
